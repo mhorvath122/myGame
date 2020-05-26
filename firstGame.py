@@ -18,6 +18,13 @@ char1 = pygame.image.load('.\\Game\\standing_2.png')
 
 clock = pygame.time.Clock()
 
+bulletSound = pygame.mixer.Sound('.\\Game\\Grenade-SoundBible.com-1777900486.wav')
+hitSound = pygame.mixer.Sound('.\\Game\\Batman Punch-SoundBible.com-456755860.wav')
+
+
+music = pygame.mixer.music.load('.\\Game\\music.mp3')
+pygame.mixer.music.play(-1)
+
 class player(object):
     def __init__(self, x, y, width, height, walkRight, walkLeft, char):
         self.x = x
@@ -63,7 +70,25 @@ class player(object):
                     win.blit(self.walkLeft[0], (self.x, self.y))
                     
             self.hitbox = (self.x +17, self.y + 11, 29, 52)        
-            #pygame.draw.rect(win, (255,0,0), self.hitbox,2)        
+            #pygame.draw.rect(win, (255,0,0), self.hitbox,2)   
+       
+    def touch(self):
+        self.jumpCount = 77
+        self.x = 60
+        self.y = 400
+        self.walkCount = 0
+        font1 = pygame.font.SysFont('bookerly', 100)
+        text = font1.render('-5', 1, (255, 0, 0))
+        win.blit(text, (250 - (text.get_width()/2), 200))
+        pygame.display.update()
+        i = 0
+        while i < 30:
+            pygame.time.delay(1)
+            i += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    i = 31
+                    pygame.quit()       
                     
                     
 class enemy(object):
@@ -107,8 +132,7 @@ class enemy(object):
                 try: bullets.pop(bullets.index(bullet))  
                 except ValueError:
                     pass
-            
-        
+
     
     def move(self):
         if self.vel > 0:
@@ -125,10 +149,12 @@ class enemy(object):
                 self.walkCount = 0
                 
     def hit(self, player):
+        hitSound.play()
         player.score += 1
         if self.health >0:
             self. health -= 1
 
+    
                 
         
         
@@ -189,8 +215,26 @@ def game_master():
     global cntr 
     cntr += 1
     if cntr >= 100:
-        goblins.append(enemy(randint(100, 300), 402, 64, 64, randint(300, 450)))
+        goblins.append(enemy(randint(10, 300), 402, 64, 64, randint(300, 450)))
         cntr = 0
+
+def isTouched(goblins, player):
+                
+    for goblin in goblins:
+        if player.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player.hitbox[1] + player.hitbox[3] > goblin.hitbox[1]:
+            if player.hitbox[0] + player.hitbox[2] > goblin.hitbox[0] and player.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
+                player.touch()
+                player.score -= 5        
+       
+                
+       
+        
+       
+        
+       
+            
+            
+                
             
             
             
@@ -208,7 +252,7 @@ goblins = []
 
 goblins.append(enemy(100, 402, 64, 64, 300))
 goblins.append(enemy(200, 402, 64, 64, 350))
-goblins.append(enemy(300, 402, 64, 64, 450))
+goblins.append(enemy(300, 402, 64, 64, 400))
 
 run = True
 while run:
@@ -227,12 +271,16 @@ while run:
               
     check_projectiles(bullets, player1)
     check_projectiles(bullets1, player2)
+    
+    isTouched(goblins, player1)
+    isTouched(goblins, player2)
        
      
     keys = pygame.key.get_pressed()
     
     #Character 1
     if keys[pygame.K_RETURN] and player1.shootLoop == 0:
+        bulletSound.play()
         if player1.left:
             facing = -1
         else:
@@ -261,7 +309,7 @@ while run:
             player1.isJump = True
             player1.walkCount = 0
     else:
-        if player1.jumpCount >= -10:
+        if player1.jumpCount >= -10 and player1.jumpCount != 77:
             neg = 1
             if player1.jumpCount < 0:
                 neg = -1
@@ -274,6 +322,7 @@ while run:
         
      #Character 2  
     if keys[pygame.K_SPACE] and player2.shootLoop == 0:
+        bulletSound.play()
         if player2.left:
             facing1 = -1
         else:
@@ -301,7 +350,7 @@ while run:
             player2.isJump = True
             player2.walkCount = 0
     else:
-        if player2.jumpCount >= -10:
+        if player2.jumpCount >= -10 and player2.jumpCount != 77:
             neg1 = 1
             if player2.jumpCount < 0:
                 neg1 = -1
