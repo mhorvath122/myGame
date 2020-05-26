@@ -1,4 +1,5 @@
 import pygame
+from random import randint
 
 pygame.init()
 
@@ -35,6 +36,8 @@ class player(object):
         self.standing = True
         self.hitbox = (self.x +17, self.y + 11, 29, 52)
         self.shootLoop = 0
+        self.score = 0
+
         
     def Shoot_Loop(self):
         if self.shootLoop >  0:
@@ -58,8 +61,9 @@ class player(object):
                     win.blit(self.walkRight[0], (self.x, self.y))
                 else:
                     win.blit(self.walkLeft[0], (self.x, self.y))
+                    
             self.hitbox = (self.x +17, self.y + 11, 29, 52)        
-            pygame.draw.rect(win, (255,0,0), self.hitbox,2)        
+            #pygame.draw.rect(win, (255,0,0), self.hitbox,2)        
                     
                     
 class enemy(object):
@@ -76,20 +80,33 @@ class enemy(object):
         self.walkCount = 0
         self.vel = 3
         self.hitbox = (self.x +17, self.y + 2, 31, 57)
+        self.health = 10
+        self.visible = True
         
     def draw(self, win):
         self.move()
-        if self.walkCount + 1 >= 33:
-            self.walkCount = 0
-        
-        if self.vel > 0:
-            win.blit(self.walkRight[self.walkCount // 3], (self.x,self.y))
-            self.walkCount +=1
-        else: 
-            win.blit(self.walkLeft[self.walkCount // 3], (self.x,self.y))
-            self.walkCount +=1
-        self.hitbox = (self.x +17, self.y + 2, 31, 57)        
-        pygame.draw.rect(win, (255,0,0), self.hitbox,2)        
+        if self.visible:
+            if self.walkCount + 1 >= 33:
+                self.walkCount = 0
+            
+            if self.vel > 0:
+                win.blit(self.walkRight[self.walkCount // 3], (self.x,self.y))
+                self.walkCount +=1
+            else: 
+                win.blit(self.walkLeft[self.walkCount // 3], (self.x,self.y))
+                self.walkCount +=1
+            self.hitbox = (self.x +17, self.y + 2, 31, 57)
+            pygame.draw.rect(win, (255, 0, 0), (self.hitbox[0], self.hitbox[1] - 20, 50, 10)) 
+            pygame.draw.rect(win, (0, 128, 0), (self.hitbox[0], self.hitbox[1] - 20, (self.health * 50) // 10, 10))        
+            #pygame.draw.rect(win, (255,0,0), self.hitbox,2)  
+            
+    def isHitted(self, bullet, bullets, player):
+        if bullet.y + bullet.radius < self.hitbox[1] + self.hitbox[3] and bullet.y + bullet.radius > self.hitbox[1]:
+            if bullet.x + bullet.radius > self.hitbox[0] and bullet.x - bullet.radius < self.hitbox[0] + self.hitbox[2]:
+                self.hit(player)                
+                try: bullets.pop(bullets.index(bullet))  
+                except ValueError:
+                    pass
             
         
     
@@ -107,8 +124,11 @@ class enemy(object):
                 self.vel = self.vel * -1
                 self.walkCount = 0
                 
-    def hit(self):
-        print('hit')
+    def hit(self, player):
+        player.score += 1
+        if self.health >0:
+            self. health -= 1
+
                 
         
         
@@ -129,11 +149,17 @@ class projectile(object):
 
 def redrawGameWindow():
     win.blit(bg, (0,0)) 
+    text = font.render('Player1: ' + str(player1.score), 1, (0,0,0))
+    text2 = font.render('Player2: ' + str(player2.score), 1, (140,14,37))
+    win.blit(text, (390, 0))
+    win.blit(text2, (390, 20))
     player1.draw(win)
-    player2.draw(win)   
-    goblin.draw(win)
-    goblin2.draw(win)
-    goblin3.draw(win)
+    player2.draw(win)  
+    
+    
+    for goblin in goblins:
+        goblin.draw(win)
+
     for bullet in bullets:
         bullet.draw(win)
     
@@ -143,28 +169,46 @@ def redrawGameWindow():
     pygame.display.update()
     
     
-def check_projectiles(bullets):
+def check_projectiles(bullets, player):
    for bullet in bullets:
-        if bullet.y + bullet.radius < goblin.hitbox[1] + goblin.hitbox[3] and bullet.y + bullet.radius > goblin.hitbox[1]:
-            if bullet.x + bullet.radius > goblin.hitbox[0] and bullet.x - bullet.radius < goblin.hitbox[0] +goblin.hitbox[2]:
-                goblin.hit()
-                bullets.pop(bullets.index(bullet)) 
+       
+        for goblin in goblins:
+           goblin.isHitted(bullet, bullets, player)
+
+                
        
         if bullet.x < 500 and bullet.x > 0:
             bullet.x += bullet.vel
         else: 
             bullets.pop(bullets.index(bullet)) 
             
+def game_master():
+    for goblin in goblins:
+        if goblin.health <= 0:
+            goblins.pop(goblins.index(goblin)) 
+    global cntr 
+    cntr += 1
+    if cntr >= 100:
+        goblins.append(enemy(randint(100, 300), 402, 64, 64, randint(300, 450)))
+        cntr = 0
+            
+            
             
 
 #mainloop
+font = pygame.font.SysFont('bookerly', 16, True, True)
 player1 = player(10, 400, 64, 64, walkRight, walkLeft, char)
 player2 = player(450, 400, 64, 64, walkRight1, walkLeft1, char1)
 bullets = []
 bullets1 = []
-goblin = enemy(100, 402, 64, 64, 300)
-goblin2 = enemy(200, 402, 64, 64, 350)
-goblin3 = enemy(300, 402, 64, 64, 450)
+cntr = 0
+
+
+goblins = []
+
+goblins.append(enemy(100, 402, 64, 64, 300))
+goblins.append(enemy(200, 402, 64, 64, 350))
+goblins.append(enemy(300, 402, 64, 64, 450))
 
 run = True
 while run:
@@ -174,13 +218,15 @@ while run:
     player1.Shoot_Loop()
     player2.Shoot_Loop()
     
+    game_master()
+    
     for event in pygame.event.get():
           if event.type == pygame.QUIT:
               run = False
               
               
-    check_projectiles(bullets)
-    check_projectiles(bullets1)
+    check_projectiles(bullets, player1)
+    check_projectiles(bullets1, player2)
        
      
     keys = pygame.key.get_pressed()
