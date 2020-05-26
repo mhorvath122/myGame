@@ -1,5 +1,5 @@
 # Játékfejlesztés pygame segítségével
-##Bevezető
+## Bevezető
 A program egy egyszerű 2 dimenziós játék. Két karakter irányítható, így ketten játszható. 
 
 A következő funkciók lettek megvalósítva:
