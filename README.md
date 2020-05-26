@@ -13,8 +13,10 @@ A következő funkciók lettek megvalósítva:
 A projekt egy .py filet és egy mappányi egyéb fájlt tartalmaz.
 
 használt könyvtárak:
-*pygame
-*random
+* pygame
+* random
+
+<img src="./images/1.png" width="300" align="middle"> <img src="./images/2.png" width="300" align="middle"> <img src="./images/3.png" width="300" align="middle">
 
 ## A program felépítése
 
