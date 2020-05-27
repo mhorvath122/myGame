@@ -157,12 +157,7 @@ class enemy(object):
         if self.health >0:
             self. health -= 1
 
-    
-                
-        
-        
-                    
-                
+              
 class projectile(object):
     def __init__(self, x, y, radius, color, facing):
         self.x = x
@@ -225,9 +220,7 @@ def isTouched(goblins, player):
     
     if player.touched != 0:
         player.touched -= 1
-
-
-            
+       
     for goblin in goblins:
         if player.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player.hitbox[1] + player.hitbox[3] > goblin.hitbox[1]:
             if player.hitbox[0] + player.hitbox[2] > goblin.hitbox[0] and player.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
@@ -236,18 +229,6 @@ def isTouched(goblins, player):
                     player.score -= 5
                     player.touched = 10
        
-                
-       
-        
-       
-        
-       
-            
-            
-                
-            
-            
-            
 
 #mainloop
 font = pygame.font.SysFont('bookerly', 16, True, True)
