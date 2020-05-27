@@ -44,6 +44,7 @@ class player(object):
         self.hitbox = (self.x +17, self.y + 11, 29, 52)
         self.shootLoop = 0
         self.score = 0
+        self.touched = 0
 
         
     def Shoot_Loop(self):
@@ -88,7 +89,9 @@ class player(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     i = 31
-                    pygame.quit()       
+                    pygame.quit() 
+
+                            
                     
                     
 class enemy(object):
@@ -219,12 +222,19 @@ def game_master():
         cntr = 0
 
 def isTouched(goblins, player):
-                
+    
+    if player.touched != 0:
+        player.touched -= 1
+
+
+            
     for goblin in goblins:
         if player.hitbox[1] < goblin.hitbox[1] + goblin.hitbox[3] and player.hitbox[1] + player.hitbox[3] > goblin.hitbox[1]:
             if player.hitbox[0] + player.hitbox[2] > goblin.hitbox[0] and player.hitbox[0] < goblin.hitbox[0] + goblin.hitbox[2]:
                 player.touch()
-                player.score -= 5        
+                if player.touched == 0:
+                    player.score -= 5
+                    player.touched = 10
        
                 
        
