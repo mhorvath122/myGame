@@ -9,6 +9,8 @@ A következő funkciók lettek megvalósítva:
 * Folyamatosan újraéledő ellenfelek
 * Pontrendszer
 * Az ellenfeleket le lehet lőni, ha hozájuk érünk pontot vesztünk
+* Játék során zene lejátszása
+* Hangeffektek lövéskor és találatkor
 
 A projekt egy .py filet és egy mappányi egyéb fájlt tartalmaz.
 
